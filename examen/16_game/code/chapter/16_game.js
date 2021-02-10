@@ -60,7 +60,7 @@ var Player = class Player {
   constructor(pos, speed) {
     this.pos = pos;
     this.speed = speed;
-  }
+  } 
 
   get type() { return "player"; }
 
@@ -69,7 +69,6 @@ var Player = class Player {
                       new Vec(0, 0));
   }
 }
-
 Player.prototype.size = new Vec(2.3, 2.2);
 
 var Lava = class Lava {
@@ -163,6 +162,7 @@ function drawActors(actors) {
     return rect;
   }));
 }
+
 
 DOMDisplay.prototype.syncState = function(state) {
   if (this.actorLayer) this.actorLayer.remove();
@@ -271,7 +271,13 @@ Coin.prototype.update = function(time) {
   return new Coin(this.basePos.plus(new Vec(0, wobblePos)),
                   this.basePos, wobble);
 };
-
+function show_image(src, width, height, alt) {
+  var img = document.createElement("img");
+  img.src = src;
+  img.width = width;
+  img.height = height;
+  document.body.appendChild(img);
+}
 var playerXSpeed = 7;
 var gravity = 30;
 var jumpSpeed = 17;
@@ -326,13 +332,34 @@ function runAnimation(frameFunc) {
   }
   requestAnimationFrame(frame);
 }
-
 function runLevel(level, Display) {
   let display = new Display(document.body, level);
   let state = State.start(level);
   let ending = 1;
+  let running = "yes";
+
   return new Promise(resolve => {
-    runAnimation(time => {
+    function escHandler(event) {
+      if (event.key != "Escape") return;
+      event.preventDefault();
+      if (running == "no") {
+        running = "yes";
+        runAnimation(frame);
+      } else if (running == "yes") {
+        running = "pausing";
+      } else {
+        running = "yes";
+      }
+    }
+    window.addEventListener("keydown", escHandler);
+    let arrowKeys = trackKeys(["ArrowLeft", "ArrowRight", "ArrowUp"]);
+
+    function frame(time) {
+      if (running == "pausing") {
+        running = "no";
+        return false;
+      }
+
       state = state.update(time, arrowKeys);
       display.syncState(state);
       if (state.status == "playing") {
@@ -342,18 +369,69 @@ function runLevel(level, Display) {
         return true;
       } else {
         display.clear();
+        window.removeEventListener("keydown", escHandler);
+        arrowKeys.unregister();
         resolve(state.status);
         return false;
       }
-    });
+    }
+    runAnimation(frame);
   });
 }
 
+function trackKeys(keys) {
+  let down = Object.create(null);
+  function track(event) {
+    if (keys.includes(event.key)) {
+      down[event.key] = event.type == "keydown";
+      event.preventDefault();
+    }
+  }
+  window.addEventListener("keydown", track);
+  window.addEventListener("keyup", track);
+  down.unregister = () => {
+    window.removeEventListener("keydown", track);
+    window.removeEventListener("keyup", track);
+  };
+  return down;
+}
+
 async function runGame(plans, Display) {
-  for (let level = 0; level < plans.length;) {
+  let lives = 3;
+  
+  for (let level = 0; level < plans.length && lives > 0;) {
+    console.log(`Level ${level + 1}, lives: ${lives}`);
     let status = await runLevel(new Level(plans[level]),
                                 Display);
     if (status == "won") level++;
+    else lives--;
   }
-  console.log("You've won!");
+  if (lives > 0) {
+    console.log("You've won!");
+  } else {
+    console.log("Game over");
+    show_image('imagenes/died.jpg', 
+    1280, 
+    720);
+    img;
+  }
 }
+// Pendiende a hacer
+if (lives == 3) {
+  show_image('imagenes/corazon.png', 
+  1280, 
+  720);
+}
+  img; console.log("You've won!");
+  if (lives == 2) {
+    show_image('imagenes/2corazon.png', 
+    1280, 
+    720);
+    img;
+  }
+    if (lives = 1) {
+      show_image('imagenes/1corazon.png', 
+      1280, 
+      720);
+      img;
+    }
