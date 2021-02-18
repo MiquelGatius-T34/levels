@@ -1,0 +1,36 @@
+body{
+  background-color: rgb(65, 144, 209);
+}
+.background    {
+                 background-image: url("fondo"); 
+                 max-width: 100px;
+                 max-height: 100px;
+                 table-layout: fixed;
+                 border-spacing: 0;   }
+.background td { padding: 0;          }
+.lava          { background-image: url("acido.png"); }
+.wall          { background-image: url("murito.jpg");
+                 background-size: auto;   }
+
+.actor  { position: absolute;  }
+.coin   { background-image: url("Banana.png"); }
+.player { background-image: url("mankey.png"); }
+
+.game {
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+  width: 75%;
+  border: 5px solid;
+}
+
+.lost .player {
+  background: rgb(0, 0, 0);
+}
+.won .player {
+  box-shadow: -4px -7px 8px white, 4px -7px 8px white;
+}
+#corazon{
+  width: 70px;
+  height: 35px;
+}
